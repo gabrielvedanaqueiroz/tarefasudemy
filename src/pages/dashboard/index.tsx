@@ -9,7 +9,6 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { db } from '@/services/firebaseConnection';
 import { addDoc, collection, query, orderBy, where, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
 import Link from 'next/link';
-import { error } from 'console';
 
 interface DashboardPros{
   user:{
