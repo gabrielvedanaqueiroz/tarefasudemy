@@ -3,7 +3,7 @@ import styles from './styles.module.css';
 import { GetServerSideProps } from 'next';
 import { useSession } from 'next-auth/react';
 import { db } from "@/services/firebaseConnection";
-import { doc, collection, query, getDoc, addDoc, where, getDocs  } from "firebase/firestore";
+import { doc, collection, query, getDoc, addDoc, where, getDocs, deleteDoc  } from "firebase/firestore";
 import Textarea from "@/components/textarea/intex";
 import { useState, ChangeEvent, FormEvent } from "react";
 import { FaTrash } from "react-icons/fa";
@@ -59,6 +59,7 @@ export default function Task({item, allComments}:TaskProps){
         taskId: item?.id,
       }
 
+      setComments((oldItens)=>[...oldItens, data]);
       setInput('');
     } 
     catch (error) {
@@ -67,6 +68,16 @@ export default function Task({item, allComments}:TaskProps){
   }
 
   async function handleDelete(id:string) {
+
+    try {
+      const dodRef = doc(db, 'comments', id);
+      await deleteDoc(dodRef); 
+
+      const deleteComment = comments.filter((item) => item.id !== id);
+      setComments(deleteComment);
+    } catch (error) {
+      console.log(error);
+    }
     
   }
 
@@ -100,7 +111,7 @@ export default function Task({item, allComments}:TaskProps){
 
         <section>
           <h2>Todos Comentarios</h2>
-          {comments.length === 0 &&( <span>nenhum comentario foi encontrado</span> )}
+          {comments.length === 0 &&( <span>Nenhum comentário foi encontrado</span> )}
 
           {comments.map((item)=>(
             <article key={item.id} className={styles.comment}>
@@ -118,9 +129,7 @@ export default function Task({item, allComments}:TaskProps){
             </article> 
           ))}
         </section>
-      </section>
-
-      
+      </section>     
 
     </div>
   )

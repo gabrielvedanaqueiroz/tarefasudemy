@@ -2,8 +2,16 @@ import Head from "next/head";
 import styles from "@/styles/home.module.css";
 import Image from "next/image";
 import heroImg from '../../public/assets/hero.png';
+import { db } from "@/services/firebaseConnection";
+import { GetStaticProps } from "next";
+import { collection, getDocs } from "firebase/firestore";
 
-export default function Home() {
+interface HomeProos{
+    posts: number,
+    comments: number,
+}
+
+export default function Home({posts, comments}: HomeProos) {
   return (
     <div className={styles.container}>
       <Head>
@@ -20,13 +28,30 @@ export default function Home() {
 
         <div className={styles.infoContent}>
           <section className={styles.box}>
-            +12 posts
+            +{posts} posts
           </section>
           <section className={styles.box}>
-            +90 comentarios 
+            +{comments} comentarios 
           </section>
         </div>
       </main>
     </div>
   );
+}
+
+export const getStaticProps: GetStaticProps = async()=>{
+
+  const commentRef      = collection(db, 'comments');
+  const commentSnapshot = await getDocs(commentRef);
+
+  const postRef       = collection(db, 'tarefas');
+  const postSnapshot  = await getDocs(postRef);
+
+  return{
+    props:{
+      posts:postSnapshot.size || 0,
+      comments: commentSnapshot.size || 0,
+    },
+    revalidate: 60, //revalidar a cada 60 segundos, ja que é uma informação estatica essa propriedade faz ser gerada novamente se tiver mudança
+  }
 }
